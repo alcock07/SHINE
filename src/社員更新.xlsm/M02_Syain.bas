@@ -12,8 +12,10 @@ Sub Syain_Update()
     Dim lngC   As Long
     
     Set cnW = New ADODB.Connection
-    cnW.ConnectionString = "Provider=Microsoft.ACE.OLEDB.12.0; Data Source=" & dbW
+    strNT = "Initial Catalog=KYUYO;"
+    cnW.ConnectionString = MYPROVIDERE & MYSERVER & strNT & USER & PSWD
     cnW.Open
+    
     strNT = "Initial Catalog=process_os;"
     cnA.ConnectionString = MYPROVIDERE & MYSERVER9 & strNT & USER & PSWD9
     cnA.Open
@@ -33,45 +35,20 @@ Sub Syain_Update()
     
     '鳥居金属の社員マスター読み込み
     strSQL = ""
-    strSQL = strSQL & "SELECT 事業所区分,"
-    strSQL = strSQL & "       社員コード,"
-    strSQL = strSQL & "       社員名,"
-    strSQL = strSQL & "       管理職区,"
-    strSQL = strSQL & "       部門3,"
-    strSQL = strSQL & "       部門名"
-    strSQL = strSQL & "  FROM グループ社員マスター"
-    strSQL = strSQL & ""
+    strSQL = strSQL & "SELECT KBN,"
+    strSQL = strSQL & "       SCODE,"
+    strSQL = strSQL & "       SNAME,"
+    strSQL = strSQL & "       MGR,"
+    strSQL = strSQL & "       BMN3,"
+    strSQL = strSQL & "       BMNNM"
+    strSQL = strSQL & "  FROM KYUMTA"
     rsW.Open strSQL, cnW, adOpenStatic, adLockReadOnly
     If rsW.EOF = False Then
         rsW.MoveFirst
         Do Until rsW.EOF
             rsA.AddNew
             For lngC = 0 To 5
-                rsA(lngC) = rsW(lngC) & ""
-            Next lngC
-            rsA.Update
-            rsW.MoveNext
-        Loop
-    End If
-    If rsW.State = adStateOpen Then rsW.Close
-    
-    '工場の社員マスター読み込み
-    strSQL = ""
-    strSQL = strSQL & "SELECT 事業所区分,"
-    strSQL = strSQL & "       社員コード,"
-    strSQL = strSQL & "       社員名,"
-    strSQL = strSQL & "       管理職区,"
-    strSQL = strSQL & "       部門3,"
-    strSQL = strSQL & "       部門名"
-    strSQL = strSQL & "  FROM グループ社員マスターT"
-    strSQL = strSQL & ""
-    rsW.Open strSQL, cnW, adOpenStatic, adLockReadOnly
-    If rsW.EOF = False Then
-        rsW.MoveFirst
-        Do Until rsW.EOF
-            rsA.AddNew
-            For lngC = 0 To 5
-                rsA(lngC) = rsW(lngC) & ""
+                rsA(lngC) = Trim(rsW(lngC))
             Next lngC
             rsA.Update
             rsW.MoveNext
