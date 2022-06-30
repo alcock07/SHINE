@@ -1,8 +1,80 @@
 Attribute VB_Name = "M02_Syain"
 Option Explicit
 
+Sub Y_Update()
+
+    '給与マスタ(KYUMTA)の新入社員区分を更新する
+    
+    Dim cnW    As New ADODB.Connection
+    Dim rsW    As New ADODB.Recordset
+    Dim strNT  As String
+    Dim strSQL As String
+    Dim strYY  As String
+    Dim lngMM  As Long
+    Dim DateA  As Date
+    Dim DateB  As Date
+    
+    strNT = "Initial Catalog=KYUYO;"
+    cnW.ConnectionString = MYPROVIDERE & MYSERVER & strNT & USER & PSWD
+    cnW.Open
+        
+    DoEvents
+        
+    '鳥居金属の社員マスター読み込み
+    strSQL = ""
+    strSQL = strSQL & "SELECT DATE2,"
+    strSQL = strSQL & "       YKBN"
+    strSQL = strSQL & "  FROM KYUMTA"
+    strSQL = strSQL & "       WHERE DATE2 Is Not Null"
+    rsW.Open strSQL, cnW, adOpenStatic, adLockOptimistic
+    
+    If rsW.EOF = False Then
+        rsW.MoveFirst
+        Do Until rsW.EOF
+            '新入社員判定処理
+            If rsW.Fields("DATE2") <> "" Then
+                DateA = rsW.Fields("DATE2")
+            End If
+            strYY = Format(Now(), "yyyy")
+            lngMM = Format(Now(), "m")
+            If lngMM >= 4 And lngMM <= 7 Then
+                lngMM = 1
+            ElseIf lngMM >= 10 And lngMM <= 12 Then
+                lngMM = 5
+            Else
+                lngMM = 0
+            End If
+            If lngMM > 0 Then
+                DateB = strYY & "/" & Format(lngMM, "00") & "/01"
+                If DateA > DateB Then
+                    rsW.Fields("YKBN") = "Y"
+                End If
+            End If
+            rsW.Update
+            rsW.MoveNext
+        Loop
+    End If
+
+    DoEvents
+    
+Exit_DB:
+
+    If Not rsW Is Nothing Then
+        If rsW.State = adStateOpen Then rsW.Close
+        Set rsW = Nothing
+    End If
+    If Not cnW Is Nothing Then
+        If cnW.State = adStateOpen Then cnW.Close
+        Set cnW = Nothing
+    End If
+
+End Sub
+
 Sub Syain_Update()
 
+    '旅費精算システムで社員名と所属、役職を検索するため
+    'ローカルの給与マスタ(KYUMTA)からサーバの社員マスタへ転記する
+    
     Dim cnW    As New ADODB.Connection
     Dim cnA    As New ADODB.Connection
     Dim rsW    As New ADODB.Recordset

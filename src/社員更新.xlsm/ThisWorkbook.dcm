@@ -16,6 +16,7 @@ Dim strCP As String
 strCP = CP_NAME
 If Trim(strCP) = "HB17" Then
     Call Open_Log(strCP)
+    Call Y_Update
     Call CR_TBL_SYN
     Call Syain_Update
     Call Close_Log(strCP)
